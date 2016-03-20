@@ -1,7 +1,7 @@
 var React = require('react');
 var AppActions = require('../../actions/app-actions');
-var FormStore = require('../stores/form-store');
-var FormStoreWatchMixin = require('../mixins/form-store-watch-mixin');
+var FormStore = require('../../stores/form-store');
+var FormStoreWatchMixin = require('../../mixins/form-store-watch-mixin');
 var fn = require('../../helpers/functional');
 var serialize = require('form-serialize');
 window.$ = window.jQuery = require('jquery');

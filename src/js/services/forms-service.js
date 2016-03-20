@@ -4,9 +4,7 @@ var pluralize = require('pluralize');
 var jsonPath = require('JSONPath');
 var global = require('../global');
 
-var apiBaseURL = window.apiBaseURL || '/api';
-
-var credentials = window.credentials;
+var apiBaseURL = global.apiBaseURL || '/api';
 
 function createMenuItems(objs) {
   return objs.map(function (obj) {
@@ -196,10 +194,10 @@ module.exports = {
   getPillboxOptions: function (source) {
     return new Promise(function (resolve, reject) {
       get(resolve, reject, source, {
-        parsefn: funciton (res) {
-          resolve({data: createItems(res.body)});
+        parsefn: function (res) {
+          return {data: createItems(res.body)};
         }
-      })
+      });
     });
   },
 
@@ -277,7 +275,7 @@ function call(resolve, reject, req, opts) {
 
   // get CSRF token
   function csrf(fn) {
-    request.get(apiBaseU + '/csrf')
+    request.get(apiBaseURL + '/csrf')
       .set('x-auth-token', sessionId)
       .auth(credentials.username, credentials.password)
       .end(function (err, res) {
@@ -295,6 +293,7 @@ function call(resolve, reject, req, opts) {
   }
 
   var mod = req.method != 'GET';
+  var credentials = global.credentials;
   req.auth(credentials.username, credentials.password);
   var sessionId = localStorage.getItem('auth-token');
   if (sessionId) {
@@ -302,7 +301,7 @@ function call(resolve, reject, req, opts) {
     mod ? csrf(send) : send();
   } else {
     // get session id
-    request.get(apiBaseU + '/token')
+    request.get(apiBaseURL + '/token')
       .auth(credentials.username, credentials.password)
       .end(function (err, res) {
         if (err) {
