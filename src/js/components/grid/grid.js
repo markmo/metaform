@@ -12,14 +12,11 @@ window.$ = window.jQuery = require('jquery');
 
 var ds1url = window.apiBaseURL || '/api';
 
-var CSRF_TOKEN_NAME = 'X-CSRF';
-var credentials = {username: 'user', password: 'password'};
-
 function getPageResults() {
   var pageResults = FormStore.getPageResults();
   return {
-    totalEntries: pageResults.totalEntries,
-    rows: pageResults.rows
+    totalEntries: pageResults.totalEntries || 0,
+    rows: pageResults.rows || []
   };
 }
 
@@ -44,10 +41,8 @@ var Grid = React.createClass({
     }
     order = this.props.order || 'asc';
     return {
-      rows: [],
       page: 1,
       pageSize: 10,
-      totalEntries: 0,
       sortBy: sortBy,
       order: order,
       item: {},
@@ -188,6 +183,7 @@ var Grid = React.createClass({
     var $checkboxes = $('.item-delete').each(function (i, item) {
       if (item.checked) {
         var url = rows[i]._links.self.href;
+        url = url.replace(new RegExp('{.*}', 'g'), '');
         deletions.push(url);
       } else {
         remaining.push(rows[i]);
@@ -301,7 +297,9 @@ var Grid = React.createClass({
       }
     }.bind(this);
     var deleteColumn = function (row) {
-      <td key={'delete-' + row.id} className="action-delete"><input className="item-delete" type="checkbox" alt="Check to delete" title="Check to delete"/></td>
+      return (
+        <td key={'delete-' + row.id} className="action-delete"><input className="item-delete" type="checkbox" alt="Check to delete" title="Check to delete"/></td>
+      )
     };
     // var deleteButton = (
     //   <td className="action-delete">

@@ -267,7 +267,21 @@ function call(resolve, reject, req, opts) {
             resolve(res.text);
           }
         } else {
-          reject(JSON.parse(res.text));
+          if (res.status === 401) {
+            localStorage.removeItem('auth-token');
+            global.setTimeout(function() {
+              // TODO
+              // define an interface for router
+              // currently depends on react-router History object
+              this.router.pushState(null, '/login');
+            }, 2000);
+            var r = JSON.parse(res.text);
+            r.originalMessage = r.message;
+            r.message = 'You have been logged out on the server, and will be redirected to login shortly.';
+            reject(r);
+          } else {
+            reject(JSON.parse(res.text));
+          }
         }
       }
     });
@@ -277,15 +291,21 @@ function call(resolve, reject, req, opts) {
   function csrf(fn) {
     request.get(apiBaseURL + '/csrf')
       .set('x-auth-token', sessionId)
-      .auth(credentials.username, credentials.password)
       .end(function (err, res) {
         if (err) {
           reject(err);
         } else {
           if (res.text.length) {
-            const csrfToken = JSON.parse(res.text);
-            global.csrfToken = csrfToken;
-            req.set(csrfToken.headerName, csrfToken.token);
+            var csrfToken = JSON.parse(res.text);
+            if (csrfToken && csrfToken.hasOwnProperty('headerName')) {
+              req.set(csrfToken.headerName, csrfToken.token);
+              fn();
+            } else {
+              reject({
+                error: 'No CSRF Token',
+                message: 'No CSRF Token'
+              });
+            }
           }
           fn();
         }
@@ -293,14 +313,13 @@ function call(resolve, reject, req, opts) {
   }
 
   var mod = req.method != 'GET';
-  var credentials = global.credentials;
-  req.auth(credentials.username, credentials.password);
   var sessionId = localStorage.getItem('auth-token');
   if (sessionId) {
     req.set('x-auth-token', sessionId);
     mod ? csrf(send) : send();
   } else {
     // get session id
+    var credentials = global.credentials;
     request.get(apiBaseURL + '/token')
       .auth(credentials.username, credentials.password)
       .end(function (err, res) {
