@@ -146,7 +146,7 @@ function createElements(schema, formType, value) {
       properties = schema.schema;
     }
 
-    var formOptions = schema.form;
+    var formOptions = schema.form || {};
 
     // TODO
     // The form options array was intended to communicate field order
