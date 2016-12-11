@@ -167,8 +167,8 @@ var List = React.createClass({
 
 function getKeyForSource(source) {
   if (source) {
-    var i = source.lastIndexOf('/') + 1;
-    return source.substring(i);
+    var match = source.match(/[^\/]+\/([^\/]+)(\/.*)?/);
+    return match[1];
   }
   return source;
 }

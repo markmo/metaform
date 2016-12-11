@@ -37,6 +37,7 @@ var ModalForm = React.createClass({
     return(
       <Modal title={this.props.title}>
         <Form name={this.props.name} formType="vertical" value={this.props.value}
+          filterParam={this.props.filterParam}
           onSubmitted={this.handleSubmission}/>
       </Modal>
     );

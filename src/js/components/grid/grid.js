@@ -413,6 +413,7 @@ var Grid = React.createClass({
         name: entity,
         value: item,
         autoshow: true,
+        filterParam: this.props.filterParam,
         onHidden: function () {
           React.unmountComponentAtNode(container);
         },

@@ -24,8 +24,8 @@ function createMenuItems(objs) {
 
 function getKeyForSource(source) {
   if (source) {
-    var i = source.lastIndexOf('/') + 1;
-    return source.substring(i);
+    var match = source.match(/[^\/]+\/([^\/]+)(\/.*)?/);
+    return match[1];
   }
   return source;
 }
@@ -159,8 +159,18 @@ module.exports = {
         obj[key] = [];
         resolve(obj);
       } else {
-        get(resolve, reject,
-          source.replace('$ds1url', apiBaseURL) + (async ? q + '&' : '?') + 'size=99999', {
+        var src = source.replace('$ds1url', apiBaseURL);
+        if (async) {
+          src += q;
+        }
+        if (src.indexOf('size=') === -1) {
+          if (src.indexOf('?') === -1) {
+            src += '?size=999';
+          } else {
+            src += '&size=999';
+          }
+        }
+        get(resolve, reject, src, {
           parsefn: function (res) {
             var json = JSON.parse(res.text);
             var rows = [];
@@ -312,26 +322,27 @@ function call(resolve, reject, req, opts) {
       });
   }
 
-  var mod = req.method != 'GET';
-  var sessionId = localStorage.getItem('auth-token');
-  if (sessionId) {
-    req.set('x-auth-token', sessionId);
-    mod ? csrf(send) : send();
-  } else {
-    // get session id
-    var credentials = global.credentials;
-    request.get(apiBaseURL + '/token')
-      .auth(credentials.username, credentials.password)
-      .end(function (err, res) {
-        if (err) {
-          reject(err);
-        } else {
-          token = JSON.parse(res.text);
-          req.set('x-auth-token', token);
-          mod ? csrf(send) : send();
-        }
-      });
-  }
+  // var mod = req.method != 'GET';
+  // var sessionId = localStorage.getItem('auth-token');
+  // if (sessionId) {
+  //   req.set('x-auth-token', sessionId);
+  //   mod ? csrf(send) : send();
+  // } else {
+  //   // get session id
+  //   var credentials = global.credentials;
+  //   request.get(apiBaseURL + '/token')
+  //     .auth(credentials.username, credentials.password)
+  //     .end(function (err, res) {
+  //       if (err) {
+  //         reject(err);
+  //       } else {
+  //         token = JSON.parse(res.text);
+  //         req.set('x-auth-token', token);
+  //         mod ? csrf(send) : send();
+  //       }
+  //     });
+  // }
+  send();
 }
 
 function post(resolve, reject, url, opts) {

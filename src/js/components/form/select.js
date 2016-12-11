@@ -33,7 +33,8 @@ var Select = React.createClass({
 
   componentDidMount: function () {
     if (!this.props.enum && !this.props.async) {
-      AppActions.getSelectOptions(this.props.source);
+      var source = this.props.source.replace('$filterParam', this.props.filterParam);
+      AppActions.getSelectOptions(source);
     }
   },
 
@@ -116,8 +117,8 @@ var Select = React.createClass({
 
 function getKeyForSource(source) {
   if (source) {
-    var i = source.lastIndexOf('/') + 1;
-    return source.substring(i);
+    var match = source.match(/[^\/]+\/([^\/]+)(\/.*)?/);
+    return match[1];
   }
   return source;
 }

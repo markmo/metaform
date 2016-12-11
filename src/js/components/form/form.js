@@ -104,7 +104,7 @@ var Form = React.createClass({
     var schema = this.state.schema;
     var formType = this.props.formType || 'horizontal';
     var value = this.props.value || {};
-    var fields = createElements(schema, formType, value);
+    var fields = createElements(schema, formType, value, this.props.filterParam);
     var submitButton = (
       <button ref="submitBtn" type="button" className="btn btn-default"
               onClick={this.handleSubmit} data-loading-text="Updating..."
@@ -136,7 +136,7 @@ function getFormSchema() {
   return {schema: FormStore.getFormSchema()};
 }
 
-function createElements(schema, formType, value) {
+function createElements(schema, formType, value, filterParam) {
   var properties;
   var i;
   if ('schema' in schema) {
@@ -213,7 +213,7 @@ function createElements(schema, formType, value) {
       );
     } else {
       return _.mapObject(function (k, v) {
-        return createField(formType, value, formOptions, k, v);
+        return createField(formType, value, formOptions, k, v, filterParam);
       }, properties);
     }
   } else {
@@ -221,8 +221,8 @@ function createElements(schema, formType, value) {
   }
 }
 
-function createField(formType, value, formOptions, k, v) {
-  var opts = $.extend({}, {key: k, field: k, value: value[k], formType: formType}, v);
+function createField(formType, value, formOptions, k, v, filterParam) {
+  var opts = $.extend({}, {key: k, field: k, value: value[k], formType: formType, filterParam: filterParam}, v);
   if (formOptions && (k in formOptions)) {
     opts = $.extend({}, opts, formOptions[k]);
   }
