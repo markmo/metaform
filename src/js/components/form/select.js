@@ -28,6 +28,7 @@ var Select = React.createClass({
     if (this.isMounted()) {
       var key = getKeyForSource(this.props.source);
       this.setState({menuItems: FormStore.getSelectOptions(key)});
+      this.props.selectPopulatedAction();
     }
   },
 

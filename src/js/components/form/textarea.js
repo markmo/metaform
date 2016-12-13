@@ -20,13 +20,15 @@ var Textarea = React.createClass({
       return (
         <textarea className={d.classNames('form-control', this.props.className)} id={this.props.field}
                   name={this.props.field} placeholder={this.props.description} rows={this.props.rows || 5}
-                  value={this.state.value} onChange={this.handleChange}/>
+                  value={this.state.value} onChange={this.handleChange}
+                  disabled={this.props.disabled}/>
       );
     }
     var textarea = (
       <textarea className="form-control" id={this.props.field}
                 name={this.props.field} placeholder={this.props.description} rows={this.props.rows || 5}
-                value={this.state.value} onChange={this.handleChange}/>
+                value={this.state.value} onChange={this.handleChange}
+                disabled={this.props.disabled}/>
     );
     var labelGridColumns = this.props.labelGridColumns || 2;
     var controlGridColumns = 12 - labelGridColumns;

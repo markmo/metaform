@@ -7,7 +7,6 @@ var Paginator = require('./paginator');
 var ModalForm = require('../form/modal-form');
 var ConfirmButton = require('../form/confirm-button');
 var StringUtils = require('../../helpers/string');
-var global = require('../global');
 window.$ = window.jQuery = require('jquery');
 
 var ds1url = window.apiBaseURL || '/api';

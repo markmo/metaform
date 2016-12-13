@@ -19,12 +19,14 @@ var TextInput = React.createClass({
     if (this.props.noContainer) {
       return (
         <input className={d.classNames('form-control', this.props.className)} id={this.props.field}
-               name={this.props.field} placeholder={this.props.description} value={this.state.value} onChange={this.handleChange}/>
+               name={this.props.field} placeholder={this.props.description} value={this.state.value} onChange={this.handleChange}
+               disabled={this.props.disabled}/>
       );
     }
     var textInput = (
       <input className="form-control" id={this.props.field}
-             name={this.props.field} placeholder={this.props.description} value={this.state.value} onChange={this.handleChange}/>
+             name={this.props.field} placeholder={this.props.description} value={this.state.value} onChange={this.handleChange}
+             disabled={this.props.disabled}/>
     );
     var labelGridColumns = this.props.labelGridColumns || 2;
     var controlGridColumns = 12 - labelGridColumns;

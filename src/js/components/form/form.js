@@ -24,6 +24,13 @@ var Form = React.createClass({
     AppActions.getFormSchema(this.props.name);
   },
 
+  shouldComponentUpdate: function (nextProps, nextState) {
+    // var shouldUpdate = !this.props.async && nextProps.value !== this.currentValue;
+    // this.currentValue = nextProps.value;
+    // return shouldUpdate;
+    return !this.props.async;
+  },
+
   // componentDidMount: function () {
   //   $('.checkbox').checkbox();
   // },
@@ -100,16 +107,27 @@ var Form = React.createClass({
     }
   },
 
+  handleSelectPopulated: function () {
+    this.setState({disabled: false});
+  },
+
   render: function () {
     var schema = this.state.schema;
     var formType = this.props.formType || 'horizontal';
     var value = this.props.value || {};
-    var fields = createElements(schema, formType, value, this.props.filterParam);
-    var submitButton = (
-      <button ref="submitBtn" type="button" className="btn btn-default"
-              onClick={this.handleSubmit} data-loading-text="Updating..."
-              autoComplete="off">Save</button>
-    );
+    var fields = createElements(schema, formType, value, this.props.filterParam, this.handleSelectPopulated, this.state.disabled);
+    var submitButton;
+    if (this.state.disabled) {
+      submitButton = (
+        <button ref="submitBtn" type="button" className="btn btn-default" disabled>Save</button>
+      );
+    } else {
+      submitButton = (
+        <button ref="submitBtn" type="button" className="btn btn-default"
+                onClick={this.handleSubmit} data-loading-text="Updating..."
+                autoComplete="off">Save</button>
+      );
+    }
     if (formType === 'horizontal') {
       return (
         <form id={this.props.name + '-form'} ref={this.props.name + '-form'} role="form" className="form-horizontal">
@@ -133,10 +151,10 @@ var Form = React.createClass({
 });
 
 function getFormSchema() {
-  return {schema: FormStore.getFormSchema()};
+  return {schema: FormStore.getFormSchema(), disabled: true};
 }
 
-function createElements(schema, formType, value, filterParam) {
+function createElements(schema, formType, value, filterParam, handleSelectPopulated, disabled) {
   var properties;
   var i;
   if ('schema' in schema) {
@@ -173,7 +191,7 @@ function createElements(schema, formType, value, filterParam) {
         fields = [];
         for (var j = 0; j < tab.fields.length; j++) {
           fieldname = tab.fields[j];
-          fields.push(createField(formType, value, formOptions, fieldname, properties[fieldname]));
+          fields.push(createField(formType, value, formOptions, fieldname, properties[fieldname], filterParam, handleSelectPopulated, disabled));
         }
         if (i == 0) {
           li = (
@@ -213,7 +231,7 @@ function createElements(schema, formType, value, filterParam) {
       );
     } else {
       return _.mapObject(function (k, v) {
-        return createField(formType, value, formOptions, k, v, filterParam);
+        return createField(formType, value, formOptions, k, v, filterParam, handleSelectPopulated, disabled);
       }, properties);
     }
   } else {
@@ -221,8 +239,8 @@ function createElements(schema, formType, value, filterParam) {
   }
 }
 
-function createField(formType, value, formOptions, k, v, filterParam) {
-  var opts = $.extend({}, {key: k, field: k, value: value[k], formType: formType, filterParam: filterParam}, v);
+function createField(formType, value, formOptions, k, v, filterParam, handleSelectPopulated, disabled) {
+  var opts = $.extend({}, {key: k, field: k, value: value[k], formType: formType, filterParam: filterParam, selectPopulatedAction: handleSelectPopulated, disabled: disabled}, v);
   if (formOptions && (k in formOptions)) {
     opts = $.extend({}, opts, formOptions[k]);
   }
