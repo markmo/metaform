@@ -113,11 +113,25 @@ var Form = React.createClass({
 
   render: function () {
     var schema = this.state.schema;
+    var hasSelect = false;
+    if ('schema' in schema) {
+      if ('properties' in schema.schema) {
+        properties = schema.schema.properties;
+      } else {
+        properties = schema.schema;
+      }
+      var hasSelect = Object.keys(properties).some(function (key) {
+        return properties[key].type === 'array';
+      });
+    }
+    if (!hasSelect) {
+      disabled = false;
+    }
     var formType = this.props.formType || 'horizontal';
     var value = this.props.value || {};
-    var fields = createElements(schema, formType, value, this.props.filterParam, this.handleSelectPopulated, this.state.disabled);
+    var fields = createElements(schema, formType, value, this.props.filterParam, this.handleSelectPopulated, this.state.disabled && hasSelect);
     var submitButton;
-    if (this.state.disabled) {
+    if (this.state.disabled && hasSelect) {
       submitButton = (
         <button ref="submitBtn" type="button" className="btn btn-default" disabled>Save</button>
       );
@@ -163,7 +177,6 @@ function createElements(schema, formType, value, filterParam, handleSelectPopula
     } else {
       properties = schema.schema;
     }
-
     var formOptions = schema.form || {};
 
     // TODO
