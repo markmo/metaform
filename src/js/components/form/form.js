@@ -124,9 +124,6 @@ var Form = React.createClass({
         return properties[key].type === 'array';
       });
     }
-    if (!hasSelect) {
-      disabled = false;
-    }
     var formType = this.props.formType || 'horizontal';
     var value = this.props.value || {};
     var fields = createElements(schema, formType, value, this.props.filterParam, this.handleSelectPopulated, this.state.disabled && hasSelect);
